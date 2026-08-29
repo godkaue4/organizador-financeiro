@@ -2,11 +2,6 @@ import flet as ft
 from models import banco_de_dados 
 import flet_charts as fc
 def main(page: ft.Page):
-    page.window.width = 400
-    page.window.height = 600
-    page.window.maximizable=False
-    
-    
     page.title = "Organizador Financeiro"
     page.bgcolor = "#1504D3" 
     banco=banco_de_dados()
@@ -44,13 +39,13 @@ def main(page: ft.Page):
             lista_gastos
             ],scroll=ft.ScrollMode.AUTO),
             expand=True,
-            alignment=ft.Alignment.CENTER,
+            padding=20,
             )
 
     def mostrar_tela(nova_tela):
 
         page.clean()
-        page.add(nova_tela)
+        page.add(ft.SafeArea(content=nova_tela,expand=True))
 
         page.update()    
 
@@ -83,13 +78,17 @@ def main(page: ft.Page):
                 page.update()
             
             
-        return ft.Column([
+        return ft.Container(
+            content=ft.Column([
             ft.Text("Adicionar Saldo", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
             valor_fild,
             descricao_fild,
             ft.FilledButton("Adicionar", on_click=adicionar_dinheiro),
             ft.TextButton("Cancelar", on_click=lambda e: mostrar_tela(tela_principal()))
-        ])
+        ]),
+           expand=True,
+           padding=20                 
+    )
     def estatistica(e):
         # 1. Agrupar os gastos por categoria (soma total de cada uma)
         soma_por_categoria = {}
@@ -141,15 +140,17 @@ def main(page: ft.Page):
         )
 
         # 5. Retornar a tela de estatísticas
-        return ft.Column(
+        return ft.Container(content=ft.Column(
             [
                 ft.Text("Estatísticas de Gastos", size=20, weight=ft.FontWeight.BOLD),
                 grafico,
                 ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal())),
             ],
             scroll=ft.ScrollMode.AUTO,
-        )
-    
+        ),
+        expand=True,
+        padding=20  
+    )
     def add_gasto(e):
         butonadd=ft.FilledButton("Adicionar", on_click=lambda e: adicionar_gasto(e),
                                  style=ft.ButtonStyle(
@@ -206,11 +207,14 @@ def main(page: ft.Page):
                 page.update()
             
                 
-        return ft.Column([
+        return ft.Container(content=ft.Column([
                 valor_f,
                 nome_f,
                 categoria_drop,
                 butonadd,
                 ft.TextButton("Cancelar", on_click=lambda e: mostrar_tela(tela_principal()))
-         ])
+         ]),
+            padding=20,
+            expand=True
+    )
 ft.app(target=main) 
