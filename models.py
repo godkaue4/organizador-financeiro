@@ -56,18 +56,32 @@ class banco_de_dados():
         return self.cursor.fetchone()[0]
     def inserir_gastos(self,onde,valor,categoria):
         self.cursor.execute("INSERT INTO GASTO (gasto,onde,categoria) VALUES(?,?,?)",(valor,onde,categoria))
+        novo_id=self.cursor.lastrowid
+        
         self.cursor.execute("UPDATE SALDO SET saldo = saldo - ? WHERE ID=1",(valor,))
+        self.conexão.commit()
+        return novo_id
+    def remover_gasto(self,gasto_id):
+        self.cursor.execute("SELECT gasto FROM GASTO WHERE id=?",(gasto_id,))
+        row=self.cursor.fetchone()
+        if not row:
+            return
+        valor=row[0]
+        
+        self.cursor.execute("DELETE FROM GASTO WHERE id=?",(gasto_id,))
+        self.cursor.execute("UPDATE SALDO SET saldo = saldo + ? WHERE id = 1", (valor,))
         self.conexão.commit()
     def buscar_gastos(self):
         try:
-            sql="SELECT gasto,onde,categoria FROM GASTO "
+            sql="SELECT id ,gasto,onde,categoria FROM GASTO "
             self.cursor.execute(sql)
             resultado = self.cursor.fetchall()
             gasto=[]
             for linha in resultado:
-                gasto.append({'valor':linha[0],
-                              'onde':linha[1],
-                              'categoria':linha[2]})
+                gasto.append({'id':linha[0],
+                            'valor':linha[1],
+                              'onde':linha[2],
+                              'categoria':linha[3]})
             return gasto
         except db.Error as erro :
             print(f'erro {erro}')

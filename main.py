@@ -20,12 +20,27 @@ def main(page: ft.Page):
     )
         page.floating_action_button.location = ft.FloatingActionButtonLocation.END_DOCKED
         lista_gastos = ft.Column()
+        def remover_gasto(e,id_gasto):
+            nonlocal gastos
+            nonlocal saldo_atual
+            banco.remover_gasto(id_gasto)
+            valor=[v['valor'] for v in gastos if v['id']== id_gasto]
+            gastos=[g for g in gastos if g['id'] != id_gasto]
+            
+            saldo_atual += valor[0]
+            
+            mostrar_tela(tela_principal())
         for gasto in gastos:
             
             lista_gastos.controls.append(
-                ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})")
+                ft.Row([
+                    ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})"),
+                    ft.IconButton(icon=ft.Icons.DELETE,on_click=lambda e:remover_gasto(e,gasto['id']))
+                    
+                    
+                ])
+                
             )
-           # remove=ft.TextButton('remover gastos',style=ft.ButtonStyle(alignment=ft.Alignment.BOTTOM_LEFT),on_click=lambda e:remover_gastos(gasto))
         return ft.Container(
             content=ft.Column([
             txt_receita,
@@ -156,7 +171,7 @@ def main(page: ft.Page):
                                  style=ft.ButtonStyle(
                                     bgcolor='green'
                                  ))          
-        nome_f=ft.TextField(label="nome:")
+        nome_f=ft.TextField(label="onde:")
         valor_f=ft.TextField(label="quanto dinheiro voce gastou?",
                                hint_text='R$'
                                ,keyboard_type=ft.KeyboardType.NUMBER)
@@ -193,12 +208,14 @@ def main(page: ft.Page):
                     return
                 if categoria is not None and valor_f and nome_f:
                     saldo_atual -= valor
+                    novo_id=banco.inserir_gastos(nome_f.value,valor,categoria)
                     gastos.append({
+                        'id':novo_id,
                         'onde': nome_f.value,
                         'valor': valor,
                         'categoria': categoria
                     })
-                    banco.inserir_gastos(nome_f.value,valor,categoria)
+                    
                     mostrar_tela(tela_principal())
 
             except ValueError:
@@ -217,4 +234,5 @@ def main(page: ft.Page):
             padding=20,
             expand=True
     )
+
 ft.app(target=main) 
