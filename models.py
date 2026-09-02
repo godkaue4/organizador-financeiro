@@ -18,9 +18,19 @@ class banco_de_dados():
         CREATE TABLE IF NOT EXISTS SALDO(
         id INTEGER PRIMARY KEY,
         saldo REAL DEFAULT 0.0,
-        receita REAL 
+        receita REAL
+        
             )
             """
+        sql_d="""
+        CREATE TABLE IF NOT EXISTS DESCRICAO(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        descricao TEXT,
+        valor REAL,
+        data TEXT
+            )
+            """
+        
         sql_g="""
         CREATE TABLE IF NOT EXISTS GASTO( 
         id INTEGER PRIMARY KEY AUTOINCREMENT,   
@@ -31,7 +41,8 @@ class banco_de_dados():
             """
         try:
             self.cursor.execute(sql_s)
-            self.cursor.execute(sql_g)            
+            self.cursor.execute(sql_g) 
+            self.cursor.execute(sql_d)           
             self.cursor.execute("SELECT COUNT(*) FROM SALDO")
             if self.cursor.fetchone()[0] == 0:
                 self.cursor.execute("INSERT INTO SALDO (id, saldo,receita) VALUES (1, 0.0,0.0)")
@@ -71,6 +82,24 @@ class banco_de_dados():
         self.cursor.execute("DELETE FROM GASTO WHERE id=?",(gasto_id,))
         self.cursor.execute("UPDATE SALDO SET saldo = saldo + ? WHERE id = 1", (valor,))
         self.conexão.commit()
+    def resetar_dados(self):
+        self.cursor.execute("DELETE FROM GASTO")
+        self.cursor.execute("UPDATE SALDO SET saldo = 0.0, receita = 0.0 WHERE id = 1")
+        self.conexão.commit()
+    def inserir_descricao(self,descricao,valor,data):
+        self.cursor.execute("INSERT INTO DESCRICAO (descricao,valor,data) VALUES(?,?,?)",(descricao,valor,data))
+        self.conexão.commit()
+    def buscar_descricao(self):
+            sql="SELECT id,descricao,valor,data FROM DESCRICAO "
+            self.cursor.execute(sql)
+            resultado = self.cursor.fetchall()
+            descricao=[]
+            for linha in resultado:
+                descricao.append({'id':linha[0],
+                            'descricao':linha[1],
+                              'valor':linha[2],
+                              'data':linha[3]})
+            return descricao
     def buscar_gastos(self):
         try:
             sql="SELECT id ,gasto,onde,categoria FROM GASTO "
