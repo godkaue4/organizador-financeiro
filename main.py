@@ -92,6 +92,23 @@ def main(page: ft.Page):
         data_fild = ft.TextField(label="Data", label_style=ft.TextStyle(color=ft.Colors.WHITE), hint_text="dd/mm/aaaa")
 
         def adicionar_dinheiro(e):
+            if not valor_fild:
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                    page.update()
+                    return
+            elif not descricao_fild:
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira uma descrição válida.")))
+                    page.update()
+                    return
+            elif not data_fild:
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira uma data válida.")))
+                    page.update()
+                    return
+            elif not isinstance(valor_fild.value, (int, float)) or float(valor_fild.value.replace(',','.')) <= 0:
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                    page.update()
+                    return
+                
             nonlocal saldo_atual
             nonlocal receita        
             valor=float(valor_fild.value.replace(',','.'))
@@ -106,6 +123,7 @@ def main(page: ft.Page):
                     banco.atualizar_receita(valor_fild.value)
                     banco.inserir_descricao(descricao,valor,data)
                     mostrar_tela(tela_principal())
+
                 else:
                     raise ValueError
                 
@@ -218,23 +236,25 @@ def main(page: ft.Page):
             )
         def adicionar_gasto(e):
             nonlocal saldo_atual  
+            if not valor_f.value or not nome_f.value:
+                page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um inforamções  válidas.")))
+                page.update()
+                return
+            elif not categoria_drop.value:
+                page.show_dialog( ft.SnackBar(ft.Text("Por favor, selecione uma categoria.")))
+                page.update()
+                return
+            elif isinstance(valor_f.value,(int,float)) and float(valor_f.value.replace(',','.')) <= 0:
+                page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                page.update()
+                return
+            elif float(valor_f.value.replace(',','.')) > saldo_atual:
+                page.show_dialog( ft.SnackBar(ft.Text("Saldo insuficiente para este gasto.")))
+                page.update()
+                return
             try:
-                if not valor_f.value and not nome_f.value:
-                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um inforamções  válidas.")))
-                    page.update()
-                    return
                 valor=float(valor_f.value)
                 categoria=categoria_drop.value
-                if categoria is None:
-                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, selecione uma categoria.")))
-        
-                    page.update()
-                    return
-                if valor > saldo_atual:
-                    page.show_dialog(ft.SnackBar(ft.Text('valor acima do saldo atual')))
-                    
-                    page.update()
-                    return
                 if categoria is not None and valor_f and nome_f:
                     saldo_atual -= valor
                     novo_id=banco.inserir_gastos(nome_f.value,valor,categoria)
