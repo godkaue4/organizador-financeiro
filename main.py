@@ -50,11 +50,16 @@ def main(page: ft.Page):
             
             lista_gastos.controls.append(
                 ft.Row([
-                    ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})"),
+                    ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})",
+                                max_lines=1,
+                                overflow=ft.TextOverflow.ELLIPSIS,
+                                size=14,
+                                expand=True),
+                    
                     ft.IconButton(icon=ft.Icons.DELETE,on_click=lambda e:remover_gasto(e,gasto['id']))
                     
                     
-                ])
+                ],expand=True)
                 
             )
         return ft.Container(
@@ -87,13 +92,21 @@ def main(page: ft.Page):
         
         valor_fild = ft.TextField(label="Quanto dinheiro você possui?",
                                   hint_text='R$'
-                                  ,keyboard_type=ft.KeyboardType.NUMBER, label_style=ft.TextStyle(color=ft.Colors.WHITE))
+                                  ,keyboard_type=ft.KeyboardType.NUMBER, label_style=ft.TextStyle(color=ft.Colors.WHITE),
+                                    input_filter=ft.InputFilter(
+                                                    allow=True,
+                                                    regex_string=r"[0-9,]",
+                                                    replacement_string=""
+                                                ),
+                                    on_change=lambda e: (
+                                        setattr(e.control, 'value', e.control.value.replace(",", ".")),
+                                        e.page.update()))
         descricao_fild = ft.TextField(label="Descrição", label_style=ft.TextStyle(color=ft.Colors.WHITE))
         data_fild = ft.TextField(label="Data", label_style=ft.TextStyle(color=ft.Colors.WHITE), hint_text="dd/mm/aaaa")
-
+        
         def adicionar_dinheiro(e):
             if not valor_fild:
-                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor(R$) válido.")))
                     page.update()
                     return
             elif not descricao_fild:
@@ -104,8 +117,8 @@ def main(page: ft.Page):
                     page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira uma data válida.")))
                     page.update()
                     return
-            elif not isinstance(valor_fild.value, (int, float)) or float(valor_fild.value.replace(',','.')) <= 0:
-                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+            elif not isinstance(valor_fild.value, (int, float)) <= 0:
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor(R$) válido.")))
                     page.update()
                     return
                 
