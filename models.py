@@ -39,10 +39,18 @@ class banco_de_dados():
         categoria TEXT
             )
             """
+        sql_m="""
+        CREATE TABLE IF NOT EXISTS METAS(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        meta TEXT,
+        valor REAL,
+        tempo TEXT
+        )"""
         try:
             self.cursor.execute(sql_s)
             self.cursor.execute(sql_g) 
-            self.cursor.execute(sql_d)           
+            self.cursor.execute(sql_d)  
+            self.cursor.execute(sql_m)         
             self.cursor.execute("SELECT COUNT(*) FROM SALDO")
             if self.cursor.fetchone()[0] == 0:
                 self.cursor.execute("INSERT INTO SALDO (id, saldo,receita) VALUES (1, 0.0,0.0)")
@@ -72,6 +80,19 @@ class banco_de_dados():
         self.cursor.execute("UPDATE SALDO SET saldo = saldo - ? WHERE ID=1",(valor,))
         self.conexão.commit()
         return novo_id
+    def inserir_metas(self,meta,valor,tempo):
+        self.cursor.execute("INSERT INTO METAS (meta,valor,tempo) VALUES(?,?,?)",(meta,valor,tempo))
+        self.conexão.commit()
+    def buscar_metas(self):
+        self.cursor.execute("SELECT id,meta,valor,tempo FROM METAS")
+        resultado=self.cursor.fetchall()
+        metas=[]
+        for linha in resultado:
+            metas.append({'id':linha[0],
+                          'meta':linha[1],
+                          'valor':linha[2],
+                          'tempo':linha[3]})
+        return metas
     def remover_gasto(self,gasto_id):
         self.cursor.execute("SELECT gasto FROM GASTO WHERE id=?",(gasto_id,))
         row=self.cursor.fetchone()
@@ -85,6 +106,7 @@ class banco_de_dados():
     def resetar_dados(self):
         self.cursor.execute("DELETE FROM GASTO")
         self.cursor.execute("UPDATE SALDO SET saldo = 0.0, receita = 0.0 WHERE id = 1")
+        self.cursor.execute("DELETE FROM METAS")
         self.conexão.commit()
     def inserir_descricao(self,descricao,valor,data):
         self.cursor.execute("INSERT INTO DESCRICAO (descricao,valor,data) VALUES(?,?,?)",(descricao,valor,data))

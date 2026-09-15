@@ -15,6 +15,7 @@ def main(page: ft.Page):
     gastos = banco.buscar_gastos() 
     descricao=banco.buscar_descricao() 
     receita=banco.buscar_receita()
+    metas=banco.buscar_metas()
     def tela_principal():
         txt_saldo = ft.Text(f'Saldo atual: R${saldo_atual:.2f}', size=20, weight=ft.FontWeight.BOLD,text_align=ft.TextAlign.START
                             )
@@ -27,14 +28,17 @@ def main(page: ft.Page):
     )
         page.floating_action_button_location = ft.FloatingActionButtonLocation.END_DOCKED
         lista_gastos = ft.Column()
+        lista_metas=ft.Column()
         def resetar_dados(e):
             nonlocal saldo_atual
             nonlocal receita
             nonlocal gastos
+            nonlocal metas
             banco.resetar_dados()
             saldo_atual=0.00
             receita=0.00
             gastos=[]
+            metas=[]
             mostrar_tela(tela_principal())
         def remover_gasto(e,id_gasto):
             nonlocal gastos
@@ -46,14 +50,21 @@ def main(page: ft.Page):
             saldo_atual += valor[0]
             
             mostrar_tela(tela_principal())
+        for meta in metas:
+            lista_metas.controls.append(
+                ft.Row([
+                    ft.Text(f"Meta: {meta['meta']}, Valor: R${meta['valor']:.2f}, Tempo: {meta['tempo']} meses"),
+                ])
+            )
         for gasto in gastos:
             
             lista_gastos.controls.append(
                 ft.Row([
+                    ft.Divider(height=1, color=ft.Colors.WHITE_24),
                     ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})",
                                 max_lines=1,
                                 overflow=ft.TextOverflow.ELLIPSIS,
-                                size=14,
+                                size=16,
                                 expand=True),
                     
                     ft.IconButton(icon=ft.Icons.DELETE,on_click=lambda e:remover_gasto(e,gasto['id']))
@@ -62,17 +73,23 @@ def main(page: ft.Page):
                 ],expand=True)
                 
             )
+            
         return ft.Container(
             content=ft.Column([          
             txt_receita,
             txt_saldo,
             ft.TextButton('gerar estatisticas',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.BAR_CHART,on_click=lambda e: mostrar_tela(estatistica(e))),
+            ft.TextButton('adicionar meta',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.ADD,on_click=lambda e: mostrar_tela(add_meta(e))),
             ft.Divider(color=ft.Colors.WHITE_24),
             txt_gastos ,
             ft.TextButton('add gastos',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.ADD,
                           on_click=lambda e: mostrar_tela(add_gasto(e)
                                                           )) ,
+            
             lista_gastos,
+            ft.Divider(color=ft.Colors.WHITE_24),
+            ft.Text("Metas:", size=20, weight=ft.FontWeight.BOLD),
+            lista_metas,
             ft.TextButton('remover dados',style=ft.ButtonStyle(bgcolor='red',color='white'),icon=ft.Icons.DELETE,on_click=lambda e: resetar_dados(e))
             ],scroll=ft.ScrollMode.AUTO),
             expand=True,
@@ -95,7 +112,7 @@ def main(page: ft.Page):
                                   ,keyboard_type=ft.KeyboardType.NUMBER, label_style=ft.TextStyle(color=ft.Colors.WHITE),
                                     input_filter=ft.InputFilter(
                                                     allow=True,
-                                                    regex_string=r"[0-9,]",
+                                                    regex_string=r"^\d*\.?\d*$",
                                                     replacement_string=""
                                                 ),
                                     on_change=lambda e: (
@@ -196,8 +213,8 @@ def main(page: ft.Page):
                     value=total_categoria,
                     title=f"{categoria}\n{porcentagem:.1f}%",
                     color=cores[i % len(cores)],
-                    radius=100,
-                    title_style=ft.TextStyle(size=12, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
+                    radius=150,
+                    title_style=ft.TextStyle(size=14, color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
                 )
             )
 
@@ -205,6 +222,7 @@ def main(page: ft.Page):
             sections=sections,
             sections_space=2,
             center_space_radius=40,
+            
             expand=True,
         )
         lista_descricao = ft.Column()
@@ -234,7 +252,15 @@ def main(page: ft.Page):
         nome_f=ft.TextField(label="onde:")
         valor_f=ft.TextField(label="quanto dinheiro voce gastou?",
                                hint_text='R$'
-                               ,keyboard_type=ft.KeyboardType.NUMBER)
+                               ,keyboard_type=ft.KeyboardType.NUMBER,
+                                input_filter=ft.InputFilter(
+                                            allow=True,
+                                            regex_string=r"^\d*(,\d{0,2})?$",
+                                            replacement_string=""
+                                                ),
+                                    on_change=lambda e: (
+                                        setattr(e.control, 'value', e.control.value.replace(",", ".")),
+                                        e.page.update()))
 
         categoria_drop=ft.Dropdown(label="Categoria", options=[
                 ft.dropdown.Option("Alimentação"),
@@ -296,5 +322,23 @@ def main(page: ft.Page):
             padding=20,
             expand=True
     )
-
+    def add_meta(e):
+        obj_f=ft.TextField(label='objetivo da meta:',animate_cursor_opacity=True)
+        valor_f=ft.TextField(label='quantia que deseja arrecadar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,)
+        valorm_f= ft.TextField(label='quantos deseja guardar por mês?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER)
+        def adicionar_meta(e):
+            objetivo=obj_f.value
+            valor=float(valor_f.value)
+            valor_mensal=float(valorm_f.value)
+            tempo=valor/valor_mensal
+            banco.inserir_metas(objetivo,valor,tempo)
+            return mostrar_tela(tela_principal())       
+        return ft.Container(content=ft.Column([
+                obj_f,
+                valor_f,
+                valorm_f,
+                ft.FilledButton("adicionar", on_click=lambda e: adicionar_meta(e)),
+                ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(tela_principal()))
+            ]))
+            
 ft.app(target=main) 
