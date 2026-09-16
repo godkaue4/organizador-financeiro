@@ -93,6 +93,9 @@ class banco_de_dados():
                           'valor':linha[2],
                           'tempo':linha[3]})
         return metas
+    def atualizar_meta(self,meta_id,novo_valor):
+        self.cursor.execute("UPDATE METAS SET valor = ? WHERE id = ?", (novo_valor, meta_id))
+        self.conexão.commit()
     def remover_gasto(self,gasto_id):
         self.cursor.execute("SELECT gasto FROM GASTO WHERE id=?",(gasto_id,))
         row=self.cursor.fetchone()

@@ -28,7 +28,7 @@ def main(page: ft.Page):
     )
         page.floating_action_button_location = ft.FloatingActionButtonLocation.END_DOCKED
         lista_gastos = ft.Column()
-        lista_metas=ft.Column()
+       
         def resetar_dados(e):
             nonlocal saldo_atual
             nonlocal receita
@@ -50,12 +50,6 @@ def main(page: ft.Page):
             saldo_atual += valor[0]
             
             mostrar_tela(tela_principal())
-        for meta in metas:
-            lista_metas.controls.append(
-                ft.Row([
-                    ft.Text(f"Meta: {meta['meta']}, Valor: R${meta['valor']:.2f}, Tempo: {meta['tempo']} meses"),
-                ])
-            )
         for gasto in gastos:
             
             lista_gastos.controls.append(
@@ -79,7 +73,8 @@ def main(page: ft.Page):
             txt_receita,
             txt_saldo,
             ft.TextButton('gerar estatisticas',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.BAR_CHART,on_click=lambda e: mostrar_tela(estatistica(e))),
-            ft.TextButton('adicionar meta',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.ADD,on_click=lambda e: mostrar_tela(add_meta(e))),
+            ft.TextButton('adicionar meta',style=ft.ButtonStyle(bgcolor='blue',color='white'),icon=ft.Icons.ADD,on_click=lambda e: mostrar_tela(add_meta(e))),
+            ft.TextButton('ver metas',style=ft.ButtonStyle(bgcolor='blue',color='black'),on_click=lambda e: mostrar_tela(ver_metas(e))),
             ft.Divider(color=ft.Colors.WHITE_24),
             txt_gastos ,
             ft.TextButton('add gastos',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.ADD,
@@ -88,8 +83,7 @@ def main(page: ft.Page):
             
             lista_gastos,
             ft.Divider(color=ft.Colors.WHITE_24),
-            ft.Text("Metas:", size=20, weight=ft.FontWeight.BOLD),
-            lista_metas,
+
             ft.TextButton('remover dados',style=ft.ButtonStyle(bgcolor='red',color='white'),icon=ft.Icons.DELETE,on_click=lambda e: resetar_dados(e))
             ],scroll=ft.ScrollMode.AUTO),
             expand=True,
@@ -340,5 +334,72 @@ def main(page: ft.Page):
                 ft.FilledButton("adicionar", on_click=lambda e: adicionar_meta(e)),
                 ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(tela_principal()))
             ]))
-            
+    #função que serve para ver as metas cadastradas e o progresso de cada uma delas, mostrando o tempo restante para atingir a meta e o valor que falta arrecadar.
+    def guardar_valor(e,id):
+        nonlocal metas
+        meta_atual=[m for m in metas if m['id']==id]
+        valor_f=ft.TextField(label='quanto deseja guardar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,)
+        def guardar(e):
+            nonlocal metas
+            nonlocal saldo_atual
+            try:
+                valor=float(valor_f.value)
+                if valor > saldo_atual:
+                    page.show_dialog(ft.SnackBar(ft.Text("Saldo insuficiente para guardar esse valor.")))
+                    page.update()
+                    return
+                
+                saldo_atual -= valor
+                banco.atualizar_saldo(-valor)
+                banco.atualizar_meta(id,meta_atual[0]['valor']-valor)
+                banco.inserir_gastos(f'poupança para {meta_atual[0]['meta']}',valor,'poupança')
+                metas.append({'id':meta_atual[0]['id'],
+                              'meta':meta_atual[0]['meta'],
+                              'valor':meta_atual[0]['valor']-valor,
+                              'tempo':meta_atual[0]['tempo']})
+                meta_atual[0]['valor'] -= valor
+                if meta_atual[0]['valor'] <= 0:
+                    metas = [m for m in metas if m['id'] != id]
+                    page.show_dialog(ft.AlertDialog(title=ft.Text("Parabéns! Você atingiu sua meta!")))
+                else:
+                    for m in metas:
+                        if m['id'] == id:
+                            m['valor'] = meta_atual[0]['valor']
+                            break
+                mostrar_tela(ver_metas(e))
+            except ValueError:
+                page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                page.update()
+                
+        return ft.Container(content=ft.Column([
+            ft.Text(f"guaradar valor para a meta{meta_atual[0]['meta']} "),
+            valor_f,
+            ft.FilledButton("guardar", on_click=lambda e: guardar(e) ),
+            ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(ver_metas(e))),
+        ]))
+    # função que serve para ver as metas ja existentes e progresso
+    def ver_metas(e):
+        nonlocal metas
+        lista_metas=ft.Column()
+        for meta in metas:
+            if meta is None:
+                return ft.Container(content=ft.Column([
+                    ft.Text('sem metas até o momento'),
+                    ft.TextButton('add meta',icon=ft.icons.ADD,on_click=lambda e: mostrar_tela(add_meta(e))),
+                    ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal()))    
+                ]))
+            lista_metas.controls.append(
+                ft.Row([
+                    ft.Text(f" Meta: {meta['meta']}\n Valor: R${meta['valor']:.2f} \n Tempo: {meta['tempo']} meses",size=16),
+                    ft.TextButton("guardar valor", style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE),on_click=lambda e: mostrar_tela(guardar_valor(e,meta['id']))),
+                    ft.Divider(height=1, color=ft.Colors.WHITE_24)
+                    
+                ]),
+                
+            )
+        return ft.Container(content=ft.Column([
+            ft.Text("Metas cadastradas:", size=20, weight=ft.FontWeight.BOLD),
+            lista_metas,
+            ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal())),
+        ]))
 ft.app(target=main) 
