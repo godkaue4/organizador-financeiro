@@ -44,13 +44,24 @@ class banco_de_dados():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         meta TEXT,
         valor REAL,
-        tempo TEXT
+        tempo_inicial REAL,
+        tempo REAL,
+        valor_mensal REAL,
+        valor_inicial REAL
+        )"""
+        sql_me="""
+        CREATE TABLE IF NOT EXISTS MENSAL(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        valor REAL,
+        tempo_restante REAL,
+        mês TEXT
         )"""
         try:
             self.cursor.execute(sql_s)
             self.cursor.execute(sql_g) 
             self.cursor.execute(sql_d)  
             self.cursor.execute(sql_m)         
+            self.cursor.execute(sql_me)         
             self.cursor.execute("SELECT COUNT(*) FROM SALDO")
             if self.cursor.fetchone()[0] == 0:
                 self.cursor.execute("INSERT INTO SALDO (id, saldo,receita) VALUES (1, 0.0,0.0)")
@@ -80,21 +91,40 @@ class banco_de_dados():
         self.cursor.execute("UPDATE SALDO SET saldo = saldo - ? WHERE ID=1",(valor,))
         self.conexão.commit()
         return novo_id
-    def inserir_metas(self,meta,valor,tempo):
-        self.cursor.execute("INSERT INTO METAS (meta,valor,tempo) VALUES(?,?,?)",(meta,valor,tempo))
+    def inserir_metas(self,meta,valor,tempo_inicial,tempo,valor_mensal,valor_inicial):
+        self.cursor.execute("INSERT INTO METAS (meta,valor,tempo_inicial,tempo,valor_mensal,valor_inicial) VALUES(?,?,?,?,?,?)",(meta,valor,tempo_inicial,tempo,valor_mensal,valor_inicial))
         self.conexão.commit()
+    def inserir_mensal(self,valor,tempo_restante,mes):
+        self.cursor.execute("INSERT INTO MENSAL (valor,tempo_restante,mês) VALUES(?,?,?)",(valor,tempo_restante,mes))
+        self.conexão.commit()
+    def atualizar_mensal(self,id_meta,tempo):
+        self.cursor.execute("UPDATE MENSAL SET tempo_restante = ? WHERE id = ?", (tempo, id_meta))
+        self.conexão.commit()
+    def buscar_mensal(self):
+        self.cursor.execute("SELECT id,valor,tempo_restante,mês FROM MENSAL")
+        resultado=self.cursor.fetchall()
+        mensal=[]
+        for linha in resultado:
+            mensal.append({'id':linha[0],
+                          'valor':linha[1],
+                          'tempo_restante':linha[2],
+                          'mes':linha[3]})
+        return mensal
     def buscar_metas(self):
-        self.cursor.execute("SELECT id,meta,valor,tempo FROM METAS")
+        self.cursor.execute("SELECT id,meta,valor,tempo_inicial,tempo,valor_mensal,valor_inicial FROM METAS")
         resultado=self.cursor.fetchall()
         metas=[]
         for linha in resultado:
             metas.append({'id':linha[0],
                           'meta':linha[1],
                           'valor':linha[2],
-                          'tempo':linha[3]})
+                          'tempo_inicial':linha[3],
+                          'tempo':linha[4],
+                          'valor_mensal':linha[5],
+                         'valor_inicial':linha[6]})
         return metas
-    def atualizar_meta(self,meta_id,novo_valor):
-        self.cursor.execute("UPDATE METAS SET valor = ? WHERE id = ?", (novo_valor, meta_id))
+    def atualizar_meta(self,meta_id,novo_valor,tempo):
+        self.cursor.execute("UPDATE METAS SET valor = ?, tempo = ? WHERE id = ?", (novo_valor, tempo, meta_id))
         self.conexão.commit()
     def remover_gasto(self,gasto_id):
         self.cursor.execute("SELECT gasto FROM GASTO WHERE id=?",(gasto_id,))

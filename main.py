@@ -13,9 +13,10 @@ def main(page: ft.Page):
     page.theme_mode=ft.ThemeMode.DARK   
     saldo_atual=banco.buscar_saldo()
     gastos = banco.buscar_gastos() 
-    descricao=banco.buscar_descricao() 
+    descricoes=banco.buscar_descricao() 
     receita=banco.buscar_receita()
     metas=banco.buscar_metas()
+    mensais=banco.buscar_mensal()
     def tela_principal():
         txt_saldo = ft.Text(f'Saldo atual: R${saldo_atual:.2f}', size=20, weight=ft.FontWeight.BOLD,text_align=ft.TextAlign.START
                             )
@@ -53,19 +54,21 @@ def main(page: ft.Page):
         for gasto in gastos:
             
             lista_gastos.controls.append(
-                ft.Row([
-                    ft.Divider(height=1, color=ft.Colors.WHITE_24),
-                    ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})",
+                ft.Column([                
+                        ft.Row([
+                            ft.Divider(height=1, color=ft.Colors.WHITE_24),
+                            ft.Text(f"- {gasto['onde']}: R${gasto['valor']:.2f} ({gasto['categoria']})",
                                 max_lines=1,
                                 overflow=ft.TextOverflow.ELLIPSIS,
                                 size=16,
                                 expand=True),
                     
-                    ft.IconButton(icon=ft.Icons.DELETE,on_click=lambda e:remover_gasto(e,gasto['id']))
+                            ft.IconButton(icon=ft.Icons.DELETE,on_click=lambda e:remover_gasto(e,gasto['id']))
                     
                     
-                ],expand=True)
-                
+                ],expand=True)])
+
+          
             )
             
         return ft.Container(
@@ -146,6 +149,10 @@ def main(page: ft.Page):
                     banco.atualizar_saldo(valor_fild.value)
                     banco.atualizar_receita(valor_fild.value)
                     banco.inserir_descricao(descricao,valor,data)
+                    descricoes.append({'id':banco.cursor.lastrowid,
+                                     'descricao':descricao,
+                                     'valor':valor,
+                                     'data':data})
                     mostrar_tela(tela_principal())
 
                 else:
@@ -220,7 +227,7 @@ def main(page: ft.Page):
             expand=True,
         )
         lista_descricao = ft.Column()
-        for linha in descricao:
+        for linha in descricoes:
             lista_descricao.controls.append(ft.Row([
                 ft.Text(f"Descrição: {linha['descricao']}, Valor: R${linha['valor']:.2f}, Data: {linha['data']}"),
                 
@@ -318,14 +325,30 @@ def main(page: ft.Page):
     )
     def add_meta(e):
         obj_f=ft.TextField(label='objetivo da meta:',animate_cursor_opacity=True)
-        valor_f=ft.TextField(label='quantia que deseja arrecadar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,)
+        valor_f=ft.TextField(label='quantia que deseja arrecadar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,
+                             input_filter=ft.InputFilter(
+                                            allow=True,
+                                            regex_string=r"^\d*(,\d{0,2})?$",
+                                            replacement_string=""
+                                                ),
+                                    on_change=lambda e: (
+                                        setattr(e.control, 'value', e.control.value.replace(",", ".")),
+                                        e.page.update()))
         valorm_f= ft.TextField(label='quantos deseja guardar por mês?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER)
         def adicionar_meta(e):
+            global valor_mensal
             objetivo=obj_f.value
             valor=float(valor_f.value)
             valor_mensal=float(valorm_f.value)
             tempo=valor/valor_mensal
-            banco.inserir_metas(objetivo,valor,tempo)
+            banco.inserir_metas(objetivo,valor,tempo,tempo,valor_mensal,valor)
+            metas.append({'id':banco.cursor.lastrowid,
+                          'meta':objetivo,
+                          'valor':valor,
+                          'tempo_inicial':tempo,
+                          'tempo':tempo,
+                          'valor_mensal':valor_mensal,
+                          'valor_inicial':valor})
             return mostrar_tela(tela_principal())       
         return ft.Container(content=ft.Column([
                 obj_f,
@@ -338,28 +361,56 @@ def main(page: ft.Page):
     def guardar_valor(e,id):
         nonlocal metas
         meta_atual=[m for m in metas if m['id']==id]
-        valor_f=ft.TextField(label='quanto deseja guardar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,)
+        valor_f=ft.TextField(label='quanto deseja guardar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,input_filter=ft.InputFilter(
+                                            allow=True,
+                                            regex_string=r"^\d*(,\d{0,2})?$",
+                                            replacement_string=""
+                                                ),
+                                    on_change=lambda e: (
+                                        setattr(e.control, 'value', e.control.value.replace(",", ".")),
+                                        e.page.update()))
+        mes_f=ft.TextField(label='de qual mês é o valor que deseja guardar?',hint_text='ex: janeiro',keyboard_type=ft.KeyboardType.TEXT)
         def guardar(e):
+
             nonlocal metas
             nonlocal saldo_atual
+            nonlocal mensais
             try:
                 valor=float(valor_f.value)
                 if valor > saldo_atual:
                     page.show_dialog(ft.SnackBar(ft.Text("Saldo insuficiente para guardar esse valor.")))
                     page.update()
                     return
+                if valor == meta_atual[0]['valor_mensal']:
+                    tempo_restante=meta_atual[0]['tempo']-1
+                else:
+                    tempo_restante=meta_atual[0]['tempo']-(valor/meta_atual[0]['valor_mensal'])
                 
+                banco.inserir_mensal(valor,tempo_restante,mes_f.value)
+                mensais.append({'id':banco.cursor.lastrowid,
+                                'valor':valor,
+                                'tempo_restante':tempo_restante,
+                                'mes':mes_f.value})
                 saldo_atual -= valor
                 banco.atualizar_saldo(-valor)
-                banco.atualizar_meta(id,meta_atual[0]['valor']-valor)
+                banco.atualizar_meta(id,meta_atual[0]['valor']-valor,tempo_restante)
                 banco.inserir_gastos(f'poupança para {meta_atual[0]['meta']}',valor,'poupança')
-                metas.append({'id':meta_atual[0]['id'],
-                              'meta':meta_atual[0]['meta'],
-                              'valor':meta_atual[0]['valor']-valor,
-                              'tempo':meta_atual[0]['tempo']})
+                gastos.append({
+                    'id':banco.cursor.lastrowid,
+                    'onde': f'poupança para {meta_atual[0]["meta"]}',
+                    'valor': valor,
+                    'categoria': 'poupança'
+                })
                 meta_atual[0]['valor'] -= valor
+                meta_atual[0]['tempo'] = tempo_restante
+                #metas[metas.index(meta_atual[0])]['tempo'] = tempo_restante
+
                 if meta_atual[0]['valor'] <= 0:
-                    metas = [m for m in metas if m['id'] != id]
+                    meta_atual[0]['valor'] = 0
+                    meta_atual[0]['tempo'] = 0
+                    mensais[meta_atual[0]['id']]['tempo_restante'] = 0
+                    banco.atualizar_meta(id,0,0)
+                    banco.atualizar_mensal(id, 0)
                     page.show_dialog(ft.AlertDialog(title=ft.Text("Parabéns! Você atingiu sua meta!")))
                 else:
                     for m in metas:
@@ -374,6 +425,7 @@ def main(page: ft.Page):
         return ft.Container(content=ft.Column([
             ft.Text(f"guaradar valor para a meta{meta_atual[0]['meta']} "),
             valor_f,
+            mes_f,
             ft.FilledButton("guardar", on_click=lambda e: guardar(e) ),
             ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(ver_metas(e))),
         ]))
@@ -382,23 +434,45 @@ def main(page: ft.Page):
         nonlocal metas
         lista_metas=ft.Column()
         for meta in metas:
+            valor_maximo=meta['valor_inicial']
+            progresso=0
+            barra=ft.ProgressBar(width=300, height=20, bgcolor=ft.Colors.WHITE_24, color=ft.Colors.GREEN)
+            if valor_maximo > 0:
+                progresso = ((meta['valor_inicial'] - meta['valor']) / meta['valor_inicial'])
+                barra.value = progresso
+            else:
+                barra.value = 100
+            if progresso >= 100:
+                barra.color = ft.Colors.GREEN
+            elif progresso >= 50:
+                barra.color = ft.Colors.YELLOW
+            else:
+                barra.color = ft.Colors.RED
             if meta is None:
                 return ft.Container(content=ft.Column([
                     ft.Text('sem metas até o momento'),
                     ft.TextButton('add meta',icon=ft.icons.ADD,on_click=lambda e: mostrar_tela(add_meta(e))),
                     ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal()))    
                 ]))
+            controle_de_meta=[]
+            controle_de_meta.append(ft.Text(f" Meta: {meta['meta']}\n Valor: R${meta['valor']:.2f} \n Tempo estimado : {meta['tempo_inicial']:.0f} meses\n Tempo restante: {meta['tempo']:.0f} meses",size=16))
+            if meta['valor'] > 0:
+                controle_de_meta.append(ft.TextButton("guardar valor", style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE),on_click=lambda e,id_meta=meta['id']: mostrar_tela(guardar_valor(e,id_meta))))
+            controle_de_meta.append(ft.Divider(height=1, color=ft.Colors.WHITE_24))
             lista_metas.controls.append(
-                ft.Row([
-                    ft.Text(f" Meta: {meta['meta']}\n Valor: R${meta['valor']:.2f} \n Tempo: {meta['tempo']} meses",size=16),
-                    ft.TextButton("guardar valor", style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE),on_click=lambda e: mostrar_tela(guardar_valor(e,meta['id']))),
+                ft.Column([
+                    barra,
+                    ft.Text(f"Progresso: {progresso*100:.2f}%", size=16, color=ft.Colors.WHITE),
+                    ft.Row(controle_de_meta
+                ),
                     ft.Divider(height=1, color=ft.Colors.WHITE_24)
-                    
-                ]),
+                ])
+
                 
             )
         return ft.Container(content=ft.Column([
             ft.Text("Metas cadastradas:", size=20, weight=ft.FontWeight.BOLD),
+            ft.Divider(height=1, color=ft.Colors.WHITE_24),
             lista_metas,
             ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal())),
         ]))
