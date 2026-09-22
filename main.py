@@ -17,6 +17,127 @@ def main(page: ft.Page):
     receita=banco.buscar_receita()
     metas=banco.buscar_metas()
     mensais=banco.buscar_mensal()
+    indice_atual=0
+    
+    cursos=[{'titulo':'MÓDULO 1 — ORÇAMENTO NA PRÁTICA','indice':0,'texto':'''
+    Objetivo
+
+Aprender a organizar o dinheiro, identificar os gastos e planejar como utilizar a renda.
+
+    O que é renda?
+
+Renda é todo dinheiro que uma pessoa recebe. Pode vir de mesada, salário, bolsa de estudos ou pequenos serviços.
+
+Exemplo:
+João recebe R$ 400 por mês:
+
+Mesada: R$ 250
+Pequenos serviços: R$ 150
+
+Total: R$ 400
+
+Saber quanto dinheiro entra é o primeiro passo para organizar as finanças.
+
+ Gasto fixo e gasto variável
+
+Gasto fixo: Despesa que costuma se repetir e pode manter um valor semelhante.
+
+Exemplos: plano de celular, mensalidade de curso e parcelas.
+
+Gasto variável: Despesa cujo valor ou frequência pode mudar.
+
+Exemplos: lanches, passeios, roupas e compras em jogos.
+
+Exemplo prático:
+Pedro recebe R$ 300:
+
+Celular: R$ 30
+Lanches: R$ 80
+Passeio: R$ 50
+Acessório: R$ 40
+
+Total de gastos: R$ 200
+
+Saldo restante: R$ 100
+
+    Regra 50/30/20
+
+A regra 50/30/20 é uma forma de dividir a renda:
+
+50% — Necessidades: alimentação, transporte e moradia.
+30% — Desejos: lazer, roupas e passeios.
+20% — Futuro financeiro: reserva e metas.
+
+Essa regra é apenas uma referência e pode ser adaptada à realidade de cada pessoa.
+
+Exemplo com R$ 500:
+
+Necessidades: R$ 250
+Desejos: R$ 150
+Reserva e metas: R$ 100
+    
+    Pratique no aplicativo
+
+Registre sua renda e seus gastos no Organizador Financeiro. Observe quanto dinheiro sobra e pense em como você poderia utilizá-lo.
+
+💡 Lembre-se: Organizar o dinheiro não significa deixar de aproveitar a vida, mas aprender a fazer escolhas conscientes.'''},{'titulo':'MÓDULO 2 — GASTO, DÍVIDA E INVESTIMENTO','indice':1,'texto':""""
+    Objetivo
+Entender a diferença entre gastos, dívidas e investimentos e conhecer os riscos do uso inadequado do crédito.
+
+    O que é um gasto?
+
+Gasto é o dinheiro utilizado para comprar um produto ou serviço.
+
+Exemplos:
+
+Comprar um lanche.
+Pagar transporte.
+Comprar material escolar.
+Adquirir um jogo.
+
+Um gasto não é necessariamente ruim. É importante verificar se ele cabe no orçamento.
+
+    O que é uma dívida?
+
+Dívida é uma obrigação de pagamento que ficou pendente, geralmente por causa de uma compra parcelada, empréstimo ou uso de crédito.
+
+Exemplo:
+Lucas compra um celular de R$ 1.200 em 12 parcelas de R$ 100.
+
+Ele assume o compromisso de pagar R$ 100 por mês, considerando que não existam encargos adicionais.
+
+Antes de parcelar, é importante verificar o custo total e se as parcelas cabem no orçamento.
+
+    Dívidas com diferentes finalidades
+
+Algumas dívidas podem contribuir para objetivos pessoais, como um financiamento de estudos. Outras podem causar problemas quando envolvem juros elevados ou falta de planejamento.
+
+Exemplo:
+
+Crédito para um curso: pode ajudar na formação, mas precisa ser pago.
+Cartão de crédito rotativo: pode aumentar o valor da dívida devido aos encargos.
+
+Nenhuma dívida deve ser considerada automaticamente boa ou ruim. É necessário analisar as condições e a capacidade de pagamento.
+
+    Cuidado com o cartão de crédito
+
+Quando uma pessoa não paga integralmente a fatura do cartão, podem ser cobrados juros e outros encargos.
+
+Isso pode fazer uma dívida crescer e comprometer a renda dos meses seguintes.
+
+Dicas:
+
+Confira o valor da fatura.
+Evite compras que não cabem no orçamento.
+Conheça os juros e as condições do crédito.
+Procure orientação de um responsável quando necessário.
+📱 Pratique no aplicativo
+
+Imagine que você quer comprar um celular de R$ 1.000.
+
+Você pode comparar diferentes formas de pagamento e analisar como cada escolha afetaria seu orçamento.
+
+💡 Lembre-se: Antes de assumir uma dívida, entenda quanto você terá que pagar e se conseguirá cumprir o compromisso."""}]
     def tela_principal():
         txt_saldo = ft.Text(f'Saldo atual: R${saldo_atual:.2f}', size=20, weight=ft.FontWeight.BOLD,text_align=ft.TextAlign.START
                             )
@@ -28,8 +149,47 @@ def main(page: ft.Page):
         tooltip="Adicionar Saldo",
     )
         page.floating_action_button_location = ft.FloatingActionButtonLocation.END_DOCKED
-        lista_gastos = ft.Column()
-       
+        lista_gastos = ft.Column()       
+        def fechar_drawer():
+            if drawer in page._dialogs.controls:
+                page._dialogs.controls.remove(drawer)
+                page._dialogs.update()
+        async def handle_show_drawer():
+            if drawer in page._dialogs.controls:
+                page._dialogs.controls.remove(drawer)
+                page._dialogs.update()
+            else:
+                page.show_dialog(drawer)
+        def handle_dismissal(e: ft.Event[ft.NavigationDrawer]):
+                print('Drawer dismissed')
+                fechar_drawer()
+        async def handle_change(e:ft.Event[ft.NavigationDrawer]):
+                print(f"Selected Index changed: {e.control.selected_index}")
+                fechar_drawer()
+                if e.control.selected_index==0:
+                    mostrar_tela(tela_principal(),True)
+                elif e.control.selected_index == 1:
+                   mostrar_tela(curso())
+                page.update()
+        drawer=ft.NavigationDrawer(
+                on_dismiss=handle_dismissal,
+                on_change=handle_change,
+                tile_padding=ft.Padding(top=10),
+                controls=[ft.Container(height=12),
+                          ft.NavigationDrawerDestination(
+                    icon=ft.Icons.HOME_OUTLINED,
+                    label="pagina incial",
+                               ),
+                            ft.NavigationDrawerDestination(
+                                    icon=ft.Icons.ATTACH_MONEY_OUTLINED,
+                                    label="mini curso de educação fincanceira",
+                                                         )
+                          
+                          ]
+            )
+        app_bar=ft.AppBar(leading=ft.IconButton(ft.Icons.MENU,on_click=handle_show_drawer)
+                          )
+        page.appbar=app_bar
         def resetar_dados(e):
             nonlocal saldo_atual
             nonlocal receita
@@ -40,7 +200,7 @@ def main(page: ft.Page):
             receita=0.00
             gastos=[]
             metas=[]
-            mostrar_tela(tela_principal())
+            mostrar_tela(tela_principal(),True)
         def remover_gasto(e,id_gasto):
             nonlocal gastos
             nonlocal saldo_atual
@@ -50,7 +210,7 @@ def main(page: ft.Page):
             
             saldo_atual += valor[0]
             
-            mostrar_tela(tela_principal())
+            mostrar_tela(tela_principal(),True)
         for gasto in gastos:
             
             lista_gastos.controls.append(
@@ -72,7 +232,7 @@ def main(page: ft.Page):
             )
             
         return ft.Container(
-            content=ft.Column([          
+            content=ft.Column([      
             txt_receita,
             txt_saldo,
             ft.TextButton('gerar estatisticas',style=ft.ButtonStyle(bgcolor='green',color='white'),icon=ft.Icons.BAR_CHART,on_click=lambda e: mostrar_tela(estatistica(e))),
@@ -93,14 +253,17 @@ def main(page: ft.Page):
             padding=20,
             )
 
-    def mostrar_tela(nova_tela):
-
+    def mostrar_tela(nova_tela,e_principal=False):
+        if e_principal:
+            pass
+        else:
+            page.floating_action_button = None
         page.clean()
         page.add(ft.SafeArea(content=nova_tela,expand=True))
 
         page.update()    
 
-    mostrar_tela(tela_principal())
+    mostrar_tela(tela_principal(),True)
         
     def add_dinheiro(e): 
         
@@ -153,7 +316,7 @@ def main(page: ft.Page):
                                      'descricao':descricao,
                                      'valor':valor,
                                      'data':data})
-                    mostrar_tela(tela_principal())
+                    mostrar_tela(tela_principal(),True)
 
                 else:
                     raise ValueError
@@ -171,11 +334,40 @@ def main(page: ft.Page):
             descricao_fild,
             data_fild,
             ft.FilledButton("Adicionar", on_click=adicionar_dinheiro),
-            ft.TextButton("Cancelar", on_click=lambda e: mostrar_tela(tela_principal()))
+            ft.TextButton("Cancelar", on_click=lambda e: mostrar_tela(tela_principal(),True))
         ]),
            expand=True,
            padding=20                 
     )
+    def curso():
+        lista_modulo=ft.Column()
+
+        nonlocal indice_atual
+        list_curso=cursos
+        for modulo in list_curso:
+            if indice_atual == modulo['indice']:
+                indice_atual=modulo['indice']
+                lista_modulo.controls.append(
+                    ft.Container(content=ft.Column([
+                        ft.Text(f'{modulo['titulo']} \n {modulo['texto']}')
+                        ]))
+                    )
+        def proximo(e):
+            nonlocal indice_atual
+            indice_atual +=1
+            lista_modulo.controls.clear()
+            return mostrar_tela(curso())
+        def anterior(e):
+            nonlocal indice_atual
+            indice_atual -=1
+            lista_modulo.controls.clear()
+            return mostrar_tela(curso())
+        return ft.Container(content=ft.Column([lista_modulo,
+            ft.Row([
+                ft.TextButton('próximo',on_click=lambda e:proximo(e) ),
+                ft.TextButton('anterior',on_click=lambda e: anterior(e))
+            ])
+        ],scroll=ft.ScrollMode.AUTO),expand=True)
     def estatistica(e):
         # 1. Agrupar os gastos por categoria (soma total de cada uma)
         soma_por_categoria = {}
@@ -190,8 +382,7 @@ def main(page: ft.Page):
 
         # 2. Caso não haja nenhum gasto ainda, evita erro e avisa o usuário
         if not soma_por_categoria:
-            page.snack_bar = ft.SnackBar(ft.Text("Nenhum gasto registrado ainda."))
-            page.snack_bar.open = True
+            page.show_dialog(ft.SnackBar(ft.Text("Nenhum gasto registrado ainda.")))
             page.update()
             return tela_principal()
 
@@ -238,7 +429,7 @@ def main(page: ft.Page):
                 ft.Text("Estatísticas de Gastos", size=20, weight=ft.FontWeight.BOLD),
                 grafico,
                 lista_descricao,
-                ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal())),
+                ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal(),True)),
             ],
             scroll=ft.ScrollMode.AUTO,
         ),
@@ -305,7 +496,7 @@ def main(page: ft.Page):
                         'categoria': categoria
                     })
                     
-                    mostrar_tela(tela_principal())
+                    mostrar_tela(tela_principal(),True)
 
             except ValueError:
                 page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
@@ -318,7 +509,7 @@ def main(page: ft.Page):
                 nome_f,
                 categoria_drop,
                 butonadd,
-                ft.TextButton("Cancelar", on_click=lambda e: mostrar_tela(tela_principal()))
+                ft.TextButton("Cancelar", on_click=lambda e: mostrar_tela(tela_principal(),True))
          ]),
             padding=20,
             expand=True
@@ -349,13 +540,13 @@ def main(page: ft.Page):
                           'tempo':tempo,
                           'valor_mensal':valor_mensal,
                           'valor_inicial':valor})
-            return mostrar_tela(tela_principal())       
+            return mostrar_tela(tela_principal(),True)       
         return ft.Container(content=ft.Column([
                 obj_f,
                 valor_f,
                 valorm_f,
                 ft.FilledButton("adicionar", on_click=lambda e: adicionar_meta(e)),
-                ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(tela_principal()))
+                ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(tela_principal(),True))
             ]))
     #função que serve para ver as metas cadastradas e o progresso de cada uma delas, mostrando o tempo restante para atingir a meta e o valor que falta arrecadar.
     def guardar_valor(e,id):
@@ -452,7 +643,7 @@ def main(page: ft.Page):
                 return ft.Container(content=ft.Column([
                     ft.Text('sem metas até o momento'),
                     ft.TextButton('add meta',icon=ft.icons.ADD,on_click=lambda e: mostrar_tela(add_meta(e))),
-                    ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal()))    
+                    ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal(),True))    
                 ]))
             controle_de_meta=[]
             controle_de_meta.append(ft.Text(f" Meta: {meta['meta']}\n Valor: R${meta['valor']:.2f} \n Tempo estimado : {meta['tempo_inicial']:.0f} meses\n Tempo restante: {meta['tempo']:.0f} meses",size=16))
@@ -474,6 +665,6 @@ def main(page: ft.Page):
             ft.Text("Metas cadastradas:", size=20, weight=ft.FontWeight.BOLD),
             ft.Divider(height=1, color=ft.Colors.WHITE_24),
             lista_metas,
-            ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal())),
+            ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal(),True)),
         ]))
 ft.app(target=main) 
