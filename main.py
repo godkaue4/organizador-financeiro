@@ -19,7 +19,7 @@ def main(page: ft.Page):
     mensais=banco.buscar_mensal()
     indice_atual=0
     
-    cursos=[{'titulo':'MÓDULO 1 — ORÇAMENTO NA PRÁTICA','indice':0,'texto':'''
+    cursos=[{'titulo':'ORÇAMENTO NA PRÁTICA','indice':0,'texto':'''
     Objetivo
 
 Aprender a organizar o dinheiro, identificar os gastos e planejar como utilizar a renda.
@@ -80,7 +80,13 @@ Reserva e metas: R$ 100
 
 Registre sua renda e seus gastos no Organizador Financeiro. Observe quanto dinheiro sobra e pense em como você poderia utilizá-lo.
 
-💡 Lembre-se: Organizar o dinheiro não significa deixar de aproveitar a vida, mas aprender a fazer escolhas conscientes.'''},{'titulo':'MÓDULO 2 — GASTO, DÍVIDA E INVESTIMENTO','indice':1,'texto':""""
+💡 Lembre-se: Organizar o dinheiro não significa deixar de aproveitar a vida, mas aprender a fazer escolhas conscientes.
+
+
+
+'''},
+            
+{'titulo':'GASTO, DÍVIDA E INVESTIMENTO','indice':1,'texto':"""
     Objetivo
 Entender a diferença entre gastos, dívidas e investimentos e conhecer os riscos do uso inadequado do crédito.
 
@@ -89,55 +95,195 @@ Entender a diferença entre gastos, dívidas e investimentos e conhecer os risco
 Gasto é o dinheiro utilizado para comprar um produto ou serviço.
 
 Exemplos:
-
 Comprar um lanche.
 Pagar transporte.
 Comprar material escolar.
 Adquirir um jogo.
-
 Um gasto não é necessariamente ruim. É importante verificar se ele cabe no orçamento.
 
-    O que é uma dívida?
 
+    O que é uma dívida?
 Dívida é uma obrigação de pagamento que ficou pendente, geralmente por causa de uma compra parcelada, empréstimo ou uso de crédito.
 
 Exemplo:
 Lucas compra um celular de R$ 1.200 em 12 parcelas de R$ 100.
-
 Ele assume o compromisso de pagar R$ 100 por mês, considerando que não existam encargos adicionais.
-
 Antes de parcelar, é importante verificar o custo total e se as parcelas cabem no orçamento.
 
     Dívidas com diferentes finalidades
-
 Algumas dívidas podem contribuir para objetivos pessoais, como um financiamento de estudos. Outras podem causar problemas quando envolvem juros elevados ou falta de planejamento.
-
 Exemplo:
-
 Crédito para um curso: pode ajudar na formação, mas precisa ser pago.
 Cartão de crédito rotativo: pode aumentar o valor da dívida devido aos encargos.
-
 Nenhuma dívida deve ser considerada automaticamente boa ou ruim. É necessário analisar as condições e a capacidade de pagamento.
 
     Cuidado com o cartão de crédito
-
 Quando uma pessoa não paga integralmente a fatura do cartão, podem ser cobrados juros e outros encargos.
-
 Isso pode fazer uma dívida crescer e comprometer a renda dos meses seguintes.
-
 Dicas:
-
 Confira o valor da fatura.
 Evite compras que não cabem no orçamento.
 Conheça os juros e as condições do crédito.
 Procure orientação de um responsável quando necessário.
+
+
 📱 Pratique no aplicativo
 
 Imagine que você quer comprar um celular de R$ 1.000.
+Você pode comparar diferentes formas de pagamento e analisar como cada escolha afetaria seu orçamento
+colocando as parcelas ou o valor total com um gasto.
+💡 Lembre-se: Antes de assumir uma dívida, entenda quanto você terá que pagar e se conseguirá cumprir o compromisso.
 
-Você pode comparar diferentes formas de pagamento e analisar como cada escolha afetaria seu orçamento.
 
-💡 Lembre-se: Antes de assumir uma dívida, entenda quanto você terá que pagar e se conseguirá cumprir o compromisso."""}]
+"""},
+{'titulo':' RESERVA DE EMERGÊNCIA','indice':2,'texto':"""
+                                                                                                                        
+Objetivo
+Compreender a importância de guardar dinheiro para situações inesperadas e aprender a planejar objetivos financeiros.
+
+    O que é uma reserva de emergência?
+
+Reserva de emergência é um dinheiro separado para ajudar a enfrentar situações inesperadas.
+Pode ser útil em situações como:
+Perda de renda.
+Despesas urgentes.
+Necessidades inesperadas de transporte.
+Consertos de equipamentos essenciais.
+A reserva deve ser adaptada à realidade financeira de cada pessoa.
+
+    Quanto guardar?
+Uma referência comum é guardar o equivalente a 3 a 6 meses de despesas essenciais. O valor necessário varia conforme a estabilidade da renda e as responsabilidades de cada pessoa.
+Exemplo:
+Se as despesas essenciais são R$ 800 por mês:
+3 meses: R$ 2.400
+6 meses: R$ 4.800
+Esses valores são exemplos de planejamento, não uma exigência para todos.
+Jovens que ainda dependem da família podem começar desenvolvendo o hábito de guardar pequenas quantias, conforme sua realidade.
+Reserva de emergência e metas
+A reserva de emergência tem uma finalidade diferente de uma meta de consumo.
+
+Reserva de emergência:
+Dinheiro destinado a imprevistos.
+
+Meta de consumo:
+Dinheiro destinado a objetivos como comprar um computador, celular ou fazer uma viagem.
+
+Meta de longo prazo:
+Dinheiro destinado a objetivos futuros, como cursos e projetos pessoais.
+
+📱 Pratique no aplicativo
+
+Crie uma meta chamada "Minha primeira reserva financeira".
+
+Defina:
+
+Valor desejado.
+Quanto pode guardar por mês.
+Prazo estimado.
+Motivo da sua meta.
+
+Acompanhe sua evolução pelo aplicativo.
+
+💡 Lembre-se: Guardar dinheiro, mesmo em pequenas quantias, pode ajudar a desenvolver o hábito de planejar.
+
+
+
+"""},
+
+{'titulo':'JUROS COMPOSTOS E METAS DE LONGO PRAZO','indice':3,'texto':'''
+    Objetivo
+Entender o funcionamento dos juros compostos e como o tempo pode influenciar o crescimento de um investimento.
+
+    O que são juros compostos?
+Juros compostos são calculados sobre um valor que inclui os juros acumulados anteriormente.
+Por isso, são conhecidos como "juros sobre juros".
+Quando o dinheiro permanece aplicado, os rendimentos podem ser incorporados ao saldo e contribuir para novos rendimentos, conforme as condições da aplicação.
+
+Exemplo numérico:
+Imagine uma aplicação fictícia:
+Valor inicial: R$ 100
+Taxa: 1% ao mês
+Prazo: 12 meses
+Sem novos depósitos
+
+Resultado aproximado: R$ 112,68
+Momento	        Valor
+Inicial	        R$ 100,00
+Após 6 meses	R$ 106,15
+Após 12 meses	R$ 112,68
+Esse exemplo é matemático e não representa uma promessa de rendimento real.
+
+    Por que começar cedo faz diferença?
+Começar a poupar mais cedo pode proporcionar mais tempo para acumular dinheiro e aproveitar possíveis rendimentos.
+Além disso, ajuda a desenvolver:
+Disciplina financeira.
+Planejamento.
+Conhecimento sobre investimentos.
+Capacidade de estabelecer objetivos.
+Começar mais tarde também pode ser útil. O importante é desenvolver hábitos compatíveis com sua realidade.
+
+    Exemplo com depósitos mensais
+Imagine uma aplicação fictícia:
+Depósito mensal: R$ 50
+Taxa: 1% ao mês
+Prazo: 12 meses
+Depósitos no final de cada mês
+Total depositado: R$ 600
+Montante aproximado: R$ 634,13
+O resultado considera uma taxa constante e não inclui impostos ou taxas.
+
+📱 Pratique no aplicativo
+Crie uma meta para um objetivo futuro.
+Exemplo:
+Meta: Comprar um computador.
+Valor desejado: R$ 2.000.
+Valor guardado: R$ 300.
+Aporte mensal: R$ 100.
+Acompanhe quanto já conseguiu guardar e quanto falta para atingir o objetivo.
+Lembre-se: O planejamento financeiro ajuda você a transformar objetivos em ações.
+
+
+
+'''},
+{'titulo':' 🎓 CONCLUSÃO DO MINI CURSO','indice':4,'texto':'''
+
+
+A educação financeira ensina a compreender e organizar o dinheiro de maneira consciente.
+
+Durante o curso, você aprendeu:
+
+Como organizar sua renda e seus gastos.
+A diferença entre gastos, dívidas e investimentos.
+A importância de uma reserva de emergência.
+Como funcionam os juros compostos.
+Como definir e acompanhar metas financeiras.
+
+Agora, coloque esse conhecimento em prática no Organizador Financeiro.
+
+DESAFIO FINAL
+
+Crie uma meta financeira no aplicativo:
+
+Escolha um objetivo.
+Defina o valor necessário.
+
+Depois:
+Registre quanto já possui.
+Planeje quanto pode guardar por mês.
+Acompanhe sua evolução.
+
+Pequenas decisões tomadas hoje podem ajudar você a construir hábitos financeiros para o futuro.
+
+
+REFERÊNCIAS BIBLIOGRÁFICAS
+BANCO CENTRAL DO BRASIL. Cidadania Financeira. Disponível em: https://www.bcb.gov.br/cidadaniafinanceira.
+CAIXA ECONÔMICA FEDERAL. Educação Financeira para Jovens. Disponível em: https://www.caixa.gov.br/educacao-financeira/jovens/Paginas/default.aspx.
+BRASIL. MINISTÉRIO DA FAZENDA. Portal do Investidor: Emergências e aposentadoria. Disponível em: https://www.gov.br/investidor/pt-br/investir/antes-de-investir/defina-seus-objetivos/emergencias-e-aposentadoria.
+CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: https://www.caixa.gov.br/educacao-financeira/voce/investimentos/Paginas/default.aspx.
+
+
+
+'''}]
     def tela_principal():
         txt_saldo = ft.Text(f'Saldo atual: R${saldo_atual:.2f}', size=20, weight=ft.FontWeight.BOLD,text_align=ft.TextAlign.START
                             )
@@ -354,14 +500,20 @@ Você pode comparar diferentes formas de pagamento e analisar como cada escolha 
                     )
         def proximo(e):
             nonlocal indice_atual
-            indice_atual +=1
-            lista_modulo.controls.clear()
-            return mostrar_tela(curso())
+            if indice_atual == 4:
+                pass
+            else:
+                indice_atual +=1
+                lista_modulo.controls.clear()
+                return mostrar_tela(curso())
         def anterior(e):
             nonlocal indice_atual
-            indice_atual -=1
-            lista_modulo.controls.clear()
-            return mostrar_tela(curso())
+            if indice_atual==0:
+                pass
+            else:
+                indice_atual -=1
+                lista_modulo.controls.clear()
+                return mostrar_tela(curso())
         return ft.Container(content=ft.Column([lista_modulo,
             ft.Row([
                 ft.TextButton('próximo',on_click=lambda e:proximo(e) ),
@@ -526,7 +678,25 @@ Você pode comparar diferentes formas de pagamento e analisar como cada escolha 
                                         setattr(e.control, 'value', e.control.value.replace(",", ".")),
                                         e.page.update()))
         valorm_f= ft.TextField(label='quantos deseja guardar por mês?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER)
+
+        
         def adicionar_meta(e):
+            if not valor_f.value  or not valorm_f:
+                page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor.")))
+                page.update()
+                return
+            elif valorm_f.value == '' or type(valorm_f.value) == str :
+                page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor valido.")))
+                page.update()
+                return
+            elif not obj_f.value:
+                page.show_dialog(ft.SnackBar(ft.Text('Por Favor insira um objetivo.')))
+                page.update()
+                return
+            elif isinstance(valor_f.value,(int,float)) and float(valor_f.value.replace(',','.')) <= 0:
+                page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                page.update()
+                return
             global valor_mensal
             objetivo=obj_f.value
             valor=float(valor_f.value)
@@ -561,6 +731,22 @@ Você pode comparar diferentes formas de pagamento e analisar como cada escolha 
                                         setattr(e.control, 'value', e.control.value.replace(",", ".")),
                                         e.page.update()))
         mes_f=ft.TextField(label='de qual mês é o valor que deseja guardar?',hint_text='ex: janeiro',keyboard_type=ft.KeyboardType.TEXT)
+        if not valor_f:
+            page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um valor')))
+            page.update()
+            return
+        elif not mes_f:
+            page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um mês')))
+            page.update()
+            return
+        elif isinstance(valor_f.value,(int,float)) and float(valor_f.value.replace(',','.')) <= 0:
+            page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+            page.update()
+            return
+        elif float(valor_f.value.replace(',','.')) > saldo_atual:
+            page.show_dialog( ft.SnackBar(ft.Text("Saldo insuficiente para este gasto.")))
+            page.update()
+            return
         def guardar(e):
 
             nonlocal metas
