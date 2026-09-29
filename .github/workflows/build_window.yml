@@ -18,7 +18,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install Flet
-        run: pip install flet flet-charts flet-cli
+        run: pip install flet==0.86.5 flet-charts flet-cli
 
       - name: Build EXE
         run: flet build windows --yes
