@@ -853,4 +853,4 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
             lista_metas,
             ft.TextButton("Voltar", on_click=lambda e: mostrar_tela(tela_principal(),True)),
         ]))
-ft.app(target=main) 
+ft.run(main) 
