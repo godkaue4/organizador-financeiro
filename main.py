@@ -671,13 +671,21 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
         valor_f=ft.TextField(label='quantia que deseja arrecadar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,
                              input_filter=ft.InputFilter(
                                             allow=True,
-                                            regex_string=r"^\d*(,\d{0,2})?$",
+                                            regex_string=r"^\d*(.\d{0,2})?$",
                                             replacement_string=""
                                                 ),
                                     on_change=lambda e: (
                                         setattr(e.control, 'value', e.control.value.replace(",", ".")),
                                         e.page.update()))
-        valorm_f= ft.TextField(label='quantos deseja guardar por mês?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER)
+        valorm_f= ft.TextField(label='quantos deseja guardar por mês?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,
+                                input_filter=ft.InputFilter(
+                                            allow=True,
+                                            regex_string=r"^\d*(.\d{0,2})?$",
+                                            replacement_string=""
+                                                ),
+                                    on_change=lambda e: (
+                                            setattr(e.control, 'value', e.control.value.replace(",", ".")),
+                                            e.page.update()))
 
         
         def adicionar_meta(e):
@@ -685,23 +693,28 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                 page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor.")))
                 page.update()
                 return
-            elif valorm_f.value == '' or type(valorm_f.value) == str :
-                page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor valido.")))
-                page.update()
-                return
+
             elif not obj_f.value:
                 page.show_dialog(ft.SnackBar(ft.Text('Por Favor insira um objetivo.')))
                 page.update()
                 return
-            elif isinstance(valor_f.value,(int,float)) and float(valor_f.value.replace(',','.')) <= 0:
-                page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+            try:
+                objetivo=obj_f.value
+                valor=float(valor_f.value)
+                valor_mensal=float(valorm_f.value)
+                if valor <=0:
+                    page.show_dialog(ft.SnackBar(ft.Text('por favor insira um valor maior que 0')))
+                    page.update()
+                    return
+                if valor_mensal<=0:
+                    page.show_dialog(ft.SnackBar(ft.Text('por favor insira um valor mensal maior que 0')))
+                    page.update()
+                    return
+                tempo=valor/valor_mensal
+            except ValueError:
+                page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
                 page.update()
-                return
-            global valor_mensal
-            objetivo=obj_f.value
-            valor=float(valor_f.value)
-            valor_mensal=float(valorm_f.value)
-            tempo=valor/valor_mensal
+
             banco.inserir_metas(objetivo,valor,tempo,tempo,valor_mensal,valor)
             metas.append({'id':banco.cursor.lastrowid,
                           'meta':objetivo,
@@ -722,7 +735,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
     def guardar_valor(e,id):
         nonlocal metas
         meta_atual=[m for m in metas if m['id']==id]
-        valor_f=ft.TextField(label='quanto deseja guardar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,input_filter=ft.InputFilter(
+        valorg_f=ft.TextField(label='quanto deseja guardar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,input_filter=ft.InputFilter(
                                             allow=True,
                                             regex_string=r"^\d*(,\d{0,2})?$",
                                             replacement_string=""
@@ -730,32 +743,36 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                                     on_change=lambda e: (
                                         setattr(e.control, 'value', e.control.value.replace(",", ".")),
                                         e.page.update()))
-        mes_f=ft.TextField(label='de qual mês é o valor que deseja guardar?',hint_text='ex: janeiro',keyboard_type=ft.KeyboardType.TEXT)
-        if not valor_f.value:
-            page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um valor')))
-            page.update()
-            return
-        elif not mes_f.value:
-            page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um mês')))
-            page.update()
-            return
-        elif isinstance(valor_f.value,(int,float)) and float(valor_f.value.replace(',','.')) <= 0:
-            page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
-            page.update()
-            return
-        elif float(valor_f.value.replace(',','.')) > saldo_atual:
-            page.show_dialog( ft.SnackBar(ft.Text("Saldo insuficiente para este gasto.")))
-            page.update()
-            return
-        def guardar(e):
+        mesg_f=ft.TextField(label='de qual mês é o valor que deseja guardar?',hint_text='ex: janeiro',keyboard_type=ft.KeyboardType.TEXT)
 
+        def guardar(e):
             nonlocal metas
             nonlocal saldo_atual
             nonlocal mensais
+            nonlocal valorg_f
+            nonlocal mesg_f
+            if not valorg_f.value:
+                page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um valor')))
+                page.update()
+                return
+            elif not mesg_f.value:
+                page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um mês')))
+                page.update()
+                return
             try:
-                valor=float(valor_f.value)
+                valor=float(valorg_f.value)
                 if valor > saldo_atual:
                     page.show_dialog(ft.SnackBar(ft.Text("Saldo insuficiente para guardar esse valor.")))
+                    page.update()
+                    return
+                
+
+                elif isinstance(valorg_f.value,(int,float)) and float(valorg_f.value.replace(',','.')) <= 0:
+                    page.show_dialog( ft.SnackBar(ft.Text("Por favor, insira um valor válido.")))
+                    page.update()
+                    return
+                elif float(valorg_f.value.replace(',','.')) > saldo_atual:
+                    page.show_dialog( ft.SnackBar(ft.Text("Saldo insuficiente para este gasto.")))
                     page.update()
                     return
                 if valor == meta_atual[0]['valor_mensal']:
@@ -763,11 +780,11 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                 else:
                     tempo_restante=meta_atual[0]['tempo']-(valor/meta_atual[0]['valor_mensal'])
                 
-                banco.inserir_mensal(valor,tempo_restante,mes_f.value)
+                banco.inserir_mensal(valor,tempo_restante,mesg_f.value)
                 mensais.append({'id':banco.cursor.lastrowid,
                                 'valor':valor,
                                 'tempo_restante':tempo_restante,
-                                'mes':mes_f.value})
+                                'mes':mesg_f.value})
                 saldo_atual -= valor
                 banco.atualizar_saldo(-valor)
                 banco.atualizar_meta(id,meta_atual[0]['valor']-valor,tempo_restante)
@@ -801,8 +818,8 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                 
         return ft.Container(content=ft.Column([
             ft.Text(f"guaradar valor para a meta{meta_atual[0]['meta']} "),
-            valor_f,
-            mes_f,
+            valorg_f,
+            mesg_f,
             ft.FilledButton("guardar", on_click=lambda e: guardar(e) ),
             ft.TextButton("cancelar", on_click= lambda e: mostrar_tela(ver_metas(e))),
         ]))
