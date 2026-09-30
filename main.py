@@ -681,7 +681,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
 
         
         def adicionar_meta(e):
-            if not valor_f.value  or not valorm_f:
+            if not valor_f.value  or not valorm_f.value:
                 page.show_dialog(ft.SnackBar(ft.Text("Por favor, insira um valor.")))
                 page.update()
                 return
@@ -731,11 +731,11 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                                         setattr(e.control, 'value', e.control.value.replace(",", ".")),
                                         e.page.update()))
         mes_f=ft.TextField(label='de qual mês é o valor que deseja guardar?',hint_text='ex: janeiro',keyboard_type=ft.KeyboardType.TEXT)
-        if not valor_f:
+        if not valor_f.value:
             page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um valor')))
             page.update()
             return
-        elif not mes_f:
+        elif not mes_f.value:
             page.show_dialog(ft.SnackBar(ft.Text('por favor coloque um mês')))
             page.update()
             return
