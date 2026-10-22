@@ -1,5 +1,5 @@
 
-name: Build APK
+name: Build Android APK
 
 on:
   workflow_dispatch:
@@ -8,57 +8,55 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: "17"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
 
       - name: Install Flet
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "flet==0.86.5" flet-charts
+          python -m pip install "flet==0.86.5" flet-charts flet-cli
 
-      - name: Configure JNI dependency
-        run: |
-          cat > pyproject.toml <<'EOF'
-          [tool.flet.flutter.pubspec.dependency_overrides]
-          jni = "^1.1.0"
-          EOF
+      - name: Clean previous build
+        run: flet clean
 
-          echo "Configuração JNI:"
-          cat pyproject.toml
-
-      - name: Build APK
+      - name: Build Android APK
         run: flet build apk --yes --verbose
 
-      - name: Verify JNI version
+      - name: Check generated JNI version
         if: always()
         run: |
           if [ -f build/flutter/pubspec.lock ]; then
             grep -A 5 '^  jni:' build/flutter/pubspec.lock || true
           else
-            echo "pubspec.lock não encontrado."
+            echo "pubspec.lock not found"
           fi
 
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: app-android
           path: build/apk/*.apk
           if-no-files-found: error
           
