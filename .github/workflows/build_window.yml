@@ -13,47 +13,31 @@ jobs:
       PYTHONUTF8: "1"
 
     steps:
-      - name: Baixar repositório
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Instalar Flet
+      - name: Install Flet
         run: |
           python -m pip install --upgrade pip
           python -m pip install "flet==0.86.5" flet-charts flet-cli
 
-      - name: Compilar aplicativo Windows
-        run: flet build windows --yes
+      - name: Clean previous build
+        run: flet clean
 
-      - name: Verificar arquivos gerados
-        shell: pwsh
-        run: |
-          if (!(Test-Path "build/windows")) {
-            Write-Error "A pasta build/windows não foi criada."
-            exit 1
-          }
+      - name: Generate Flutter project
+        run: flet build windows --help
 
-          Get-ChildItem "build/windows" -Recurse
+      - name: Build Windows application
+        run: flet build windows --yes --verbose
 
-          $exe = Get-ChildItem "build/windows" -Filter "*.exe" -Recurse
-
-          if (!$exe) {
-            Write-Error "Nenhum executável EXE foi encontrado."
-            exit 1
-          }
-
-          Write-Host "Executável encontrado:"
-          $exe | ForEach-Object { Write-Host $_.FullName }
-
-      - name: Enviar aplicativo como artefato
+      - name: Upload application
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-windows
           path: build/windows/
           if-no-files-found: error
-          compression-level: 6
           
