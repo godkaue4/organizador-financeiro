@@ -1,3 +1,4 @@
+
 name: Build APK
 
 on:
@@ -6,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,7 +28,12 @@ jobs:
           channel: 'stable'
 
       - name: Install Flet
-        run: pip install flet==0.86.5 flet-charts
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "flet==0.86.5" flet-charts
+
+      - name: Generate Flutter project
+        run: flet build apk --help
 
       - name: Build APK
         run: flet build apk --yes
@@ -36,3 +43,5 @@ jobs:
         with:
           name: app-release
           path: build/apk/*.apk
+          if-no-files-found: error
+          
