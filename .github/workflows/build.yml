@@ -32,13 +32,30 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install "flet==0.86.5" flet-charts
 
-      - name: Generate Flutter project
-        run: flet build apk --help
+      - name: Configure JNI dependency
+        run: |
+          cat > pyproject.toml <<'EOF'
+          [tool.flet.flutter.pubspec.dependency_overrides]
+          jni = "^1.1.0"
+          EOF
+
+          echo "Configuração JNI:"
+          cat pyproject.toml
 
       - name: Build APK
-        run: flet build apk --yes
+        run: flet build apk --yes --verbose
+
+      - name: Verify JNI version
+        if: always()
+        run: |
+          if [ -f build/flutter/pubspec.lock ]; then
+            grep -A 5 '^  jni:' build/flutter/pubspec.lock || true
+          else
+            echo "pubspec.lock não encontrado."
+          fi
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: app-release
