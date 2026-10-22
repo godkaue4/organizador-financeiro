@@ -418,7 +418,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                                   ,keyboard_type=ft.KeyboardType.NUMBER, label_style=ft.TextStyle(color=ft.Colors.WHITE),
                                     input_filter=ft.InputFilter(
                                                     allow=True,
-                                                    regex_string=r"^\d*\.?\d*$",
+                                                    regex_string=r"^\d*[.,]?\d{0,2}$",
                                                     replacement_string=""
                                                 ),
                                     on_change=lambda e: (
@@ -599,7 +599,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                                ,keyboard_type=ft.KeyboardType.NUMBER,
                                 input_filter=ft.InputFilter(
                                             allow=True,
-                                            regex_string=r"^\d*(,\d{0,2})?$",
+                                            regex_string=r"^\d*[.,]?\d{0,2}$",
                                             replacement_string=""
                                                 ),
                                     on_change=lambda e: (
@@ -671,7 +671,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
         valor_f=ft.TextField(label='quantia que deseja arrecadar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,
                              input_filter=ft.InputFilter(
                                             allow=True,
-                                            regex_string=r"^\d*(.\d{0,2})?$",
+                                            regex_string=r"^\d*[.,]?\d{0,2}$",
                                             replacement_string=""
                                                 ),
                                     on_change=lambda e: (
@@ -680,7 +680,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
         valorm_f= ft.TextField(label='quantos deseja guardar por mês?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,
                                 input_filter=ft.InputFilter(
                                             allow=True,
-                                            regex_string=r"^\d*(.\d{0,2})?$",
+                                            regex_string=r"^\d*[.,]?\d{0,2}$",
                                             replacement_string=""
                                                 ),
                                     on_change=lambda e: (
@@ -737,7 +737,7 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
         meta_atual=[m for m in metas if m['id']==id]
         valorg_f=ft.TextField(label='quanto deseja guardar?',hint_text='R$',keyboard_type=ft.KeyboardType.NUMBER,input_filter=ft.InputFilter(
                                             allow=True,
-                                            regex_string=r"^\d*(,\d{0,2})?$",
+                                            regex_string=r"^\d*[.,]?\d{0,2}$",
                                             replacement_string=""
                                                 ),
                                     on_change=lambda e: (
