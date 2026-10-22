@@ -802,9 +802,9 @@ CAIXA ECONÔMICA FEDERAL. Educação Financeira: Investimentos. Disponível em: 
                 if meta_atual[0]['valor'] <= 0:
                     meta_atual[0]['valor'] = 0
                     meta_atual[0]['tempo'] = 0
-                    mensais[meta_atual[0]['id']]['tempo_restante'] = 0
+                    #mensais[meta_atual[0]['id']]['tempo_restante'] = 0
                     banco.atualizar_meta(id,0,0)
-                    banco.atualizar_mensal(id, 0)
+                    #banco.atualizar_mensal(id, 0)
                     page.show_dialog(ft.AlertDialog(title=ft.Text("Parabéns! Você atingiu sua meta!")))
                 else:
                     for m in metas:
